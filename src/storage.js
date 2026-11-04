@@ -5,8 +5,16 @@ import { fileURLToPath } from 'node:url';
 export const APP_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 export const DEFAULT_OUTPUT_PATH = 'public/data/projects.json';
 
-const SETTINGS_PATH = path.join(APP_ROOT, '.repopilot', 'settings.json');
+let dataDir = path.join(APP_ROOT, '.repopilot');
 const DEFAULT_SETTINGS = { projectsFolder: '', websiteFolder: '', outputRelativePath: DEFAULT_OUTPUT_PATH };
+
+export function setDataDir(dir) {
+  dataDir = dir;
+}
+
+function settingsPath() {
+  return path.join(dataDir, 'settings.json');
+}
 
 export async function readJson(filePath, fallback) {
   try {
@@ -36,9 +44,9 @@ export function assertRelativePath(relativePath) {
 }
 
 export async function loadSettings() {
-  return { ...DEFAULT_SETTINGS, ...(await readJson(SETTINGS_PATH, {})) };
+  return { ...DEFAULT_SETTINGS, ...(await readJson(settingsPath(), {})) };
 }
 
 export async function saveSettings(settings) {
-  await writeJson(SETTINGS_PATH, settings);
+  await writeJson(settingsPath(), settings);
 }

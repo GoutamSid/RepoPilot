@@ -4,7 +4,14 @@ RepoPilot is a small local tool. It scans the folder that holds your projects, r
 
 It runs only on your computer. It does not use GitHub, does not log in anywhere, and does not commit or push anything. You review the generated file in VS Code and commit it yourself.
 
-## Start
+## Desktop app (recommended)
+
+- Build the installer once with `npm install` then `npm run dist`. The installer appears in `dist/` (`RepoPilot Setup x.y.z.exe`).
+- Run the installer, then launch **RepoPilot** from the Start menu or desktop shortcut.
+- The app stores its settings in your user profile (`%APPDATA%\RepoPilot`), so it works from any install location.
+- For development, `npm run app` starts the desktop app without building an installer.
+
+## Browser mode (no install)
 
 - Requires Node.js 20 or newer. There is no install step.
 - Double-click `Start-RepoPilot.bat`, or run `npm start`.
@@ -65,9 +72,9 @@ Only projects with `show` turned on are included. Folder names and local paths a
 
 ## Local files and privacy
 
-- Settings are saved in `.repopilot/settings.json`, which is git-ignored.
+- In browser mode, settings are saved in `.repopilot/settings.json`, which is git-ignored. The desktop app saves them in `%APPDATA%\RepoPilot` instead.
 - RepoPilot writes only when you click **Save** on a project or **Write to website**.
-- The page is served only on your own computer (127.0.0.1).
+- In browser mode the page is served only on your own computer (127.0.0.1). The desktop app loads its interface locally and opens no network connections.
 
 ## Tests
 

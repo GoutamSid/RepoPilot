@@ -2,10 +2,17 @@ import http from 'node:http';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { execFile, spawn } from 'node:child_process';
-import { APP_ROOT, assertRelativePath, loadSettings, saveSettings, writeJson } from './storage.js';
-import { scanProjectsFolder } from './scan.js';
-import { buildWebsiteData } from './catalogue.js';
-import { STAGES, readProjectFile, templateFor, validateProject, writeProjectFile } from './project-file.js';
+import { APP_ROOT } from './storage.js';
+import {
+  ActionError,
+  buildPreview,
+  createTemplate,
+  currentState,
+  saveProject,
+  setFolder,
+  setOutputPath,
+  writeWebsiteFile,
+} from './actions.js';
 
 const HOST = '127.0.0.1';
 const PORT = Number(process.env.REPOPILOT_PORT) || 4173;
@@ -18,12 +25,13 @@ const PICKER_DESCRIPTIONS = {
 };
 const STATIC_FILES = {
   '/': { file: 'index.html', type: 'text/html; charset=utf-8' },
+  '/index.html': { file: 'index.html', type: 'text/html; charset=utf-8' },
   '/app.js': { file: 'app.js', type: 'text/javascript; charset=utf-8' },
   '/styles.css': { file: 'styles.css', type: 'text/css; charset=utf-8' },
 };
 
 function httpError(status, message) {
-  return Object.assign(new Error(message), { status });
+  return new ActionError(status, message);
 }
 
 function sendJson(res, status, body) {
@@ -50,23 +58,6 @@ async function readBody(req) {
   return parsed && typeof parsed === 'object' ? parsed : {};
 }
 
-async function requireDirectory(value, label) {
-  const text = typeof value === 'string' ? value.trim().replace(/^"(.*)"$/, '$1') : '';
-  if (!text) throw httpError(400, `${label} is required.`);
-  const resolved = path.resolve(text);
-  const stats = await fs.stat(resolved).catch(() => null);
-  if (!stats?.isDirectory()) throw httpError(400, `${label} was not found: ${resolved}`);
-  return resolved;
-}
-
-function checkedOutputPath(value) {
-  try {
-    return assertRelativePath(value);
-  } catch (error) {
-    throw httpError(400, error.message);
-  }
-}
-
 function pickFolder(kind) {
   const description = PICKER_DESCRIPTIONS[kind];
   if (!description) throw httpError(400, 'Unknown folder type.');
@@ -83,84 +74,6 @@ function pickFolder(kind) {
       else resolve({ path: stdout.trim() });
     });
   });
-}
-
-async function scanCurrent() {
-  const settings = await loadSettings();
-  if (!settings.projectsFolder) return { settings, folders: [], projectsError: '' };
-  try {
-    return { settings, folders: await scanProjectsFolder(settings.projectsFolder), projectsError: '' };
-  } catch (error) {
-    return { settings, folders: [], projectsError: `Could not read ${settings.projectsFolder}: ${error.message}` };
-  }
-}
-
-function countProjects(data) {
-  return Object.values(data.sections).reduce((total, list) => total + list.length, 0);
-}
-
-async function currentState() {
-  const { settings, folders, projectsError } = await scanCurrent();
-  return { settings, folders, projectsError, stages: STAGES };
-}
-
-async function setFolder(kind, folderPath) {
-  if (kind !== 'projects' && kind !== 'website') throw httpError(400, 'Unknown folder type.');
-  const label = kind === 'projects' ? 'Projects folder' : 'Website folder';
-  const resolved = await requireDirectory(folderPath, label);
-  const settings = await loadSettings();
-  if (kind === 'projects') settings.projectsFolder = resolved;
-  else settings.websiteFolder = resolved;
-  await saveSettings(settings);
-  return currentState();
-}
-
-async function setOutputPath(relativePath) {
-  const settings = await loadSettings();
-  settings.outputRelativePath = checkedOutputPath(relativePath);
-  await saveSettings(settings);
-  return currentState();
-}
-
-async function projectFolder(name) {
-  const settings = await loadSettings();
-  if (!settings.projectsFolder) throw httpError(400, 'Choose your projects folder first.');
-  if (typeof name !== 'string' || !name || name.startsWith('.') || name !== path.basename(name)) {
-    throw httpError(400, 'Invalid project folder.');
-  }
-  return requireDirectory(path.join(settings.projectsFolder, name), 'Project folder');
-}
-
-async function saveProject(name, value) {
-  const folder = await projectFolder(name);
-  const checked = validateProject(value);
-  if (!checked.ok) throw httpError(400, checked.errors.join(' '));
-  await writeProjectFile(folder, checked.value);
-  return currentState();
-}
-
-async function createTemplate(name) {
-  const folder = await projectFolder(name);
-  if ((await readProjectFile(folder)).status !== 'missing') throw httpError(409, 'This folder already has a project.json.');
-  await writeProjectFile(folder, templateFor(name));
-  return currentState();
-}
-
-async function buildPreview() {
-  const { settings, folders } = await scanCurrent();
-  const data = buildWebsiteData(folders);
-  const outputPath = settings.websiteFolder ? path.join(settings.websiteFolder, settings.outputRelativePath) : '';
-  return { data, count: countProjects(data), outputPath };
-}
-
-async function writeWebsiteFile() {
-  const { settings, folders } = await scanCurrent();
-  if (!settings.projectsFolder) throw httpError(400, 'Choose your projects folder first.');
-  const websiteFolder = await requireDirectory(settings.websiteFolder, 'Website folder');
-  const data = buildWebsiteData(folders);
-  const outputPath = path.join(websiteFolder, checkedOutputPath(settings.outputRelativePath));
-  await writeJson(outputPath, data);
-  return { outputPath, count: countProjects(data) };
 }
 
 const API = {

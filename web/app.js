@@ -13,7 +13,24 @@ function el(tag, props = {}, children = []) {
   return node;
 }
 
+const CHANNELS = {
+  'GET /api/state': 'state',
+  'GET /api/preview': 'preview',
+  'POST /api/pick-folder': 'pick-folder',
+  'POST /api/folder': 'folder',
+  'POST /api/output': 'output',
+  'POST /api/project': 'project',
+  'POST /api/template': 'template',
+  'POST /api/write': 'write',
+};
+
 async function api(path, body) {
+  if (window.repopilot) {
+    const channel = CHANNELS[`${body === undefined ? 'GET' : 'POST'} ${path}`];
+    const result = await window.repopilot.invoke(channel, body);
+    if (!result.ok) throw new Error(result.error);
+    return result.value;
+  }
   const options = body === undefined
     ? {}
     : { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) };
