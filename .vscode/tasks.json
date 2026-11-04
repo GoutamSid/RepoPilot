@@ -2,10 +2,10 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "RepoPilot: Open local manager",
+      "label": "RepoPilot: Start local manager",
       "type": "shell",
       "command": "node",
-      "args": ["${workspaceFolder}/src/index.js"],
+      "args": ["${workspaceFolder}/src/server.js"],
       "problemMatcher": []
     }
   ]

@@ -8,7 +8,7 @@ if errorlevel 1 (
   pause
   exit /b 1
 )
-node src\index.js
+node src\server.js
 if errorlevel 1 (
   echo.
   echo RepoPilot closed with an error.

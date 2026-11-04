@@ -1,24 +1,19 @@
-# RepoPilot — first-stage scope
+# RepoPilot — scope
 
-## Included now
-- Local command-line workflow with a Windows batch launcher and VS Code task.
-- Public GitHub repository discovery.
-- Optional private repository discovery using the user's existing GitHub CLI login or an environment token.
-- Local editable project metadata and manual project entries.
-- Domain, stage, purpose, featured, and include settings.
-- JSON preview and export to a selected website folder.
-- Optional guarded Git commit/push of only the exported JSON file.
+## Included
+- Local browser interface served on 127.0.0.1 (no install beyond Node.js).
+- Scan a chosen projects folder and read each folder's `project.json`.
+- Create a `project.json` template for folders that do not have one.
+- Edit project details and choose what is shown on the website.
+- Preview and write one grouped JSON file to the chosen website folder.
 
-## Deliberately not included in the first stage
-- Always-on background polling or a hosted backend.
-- A full Electron desktop installer.
-- Automatic claims that code is functional, tested, ready, or deployed.
-- Automatic deployment of the tool itself.
-- Website UI integration; each consuming website must implement the JSON data contract.
+## Not included
+- GitHub API access, sign-in, or tokens.
+- Git commit, push, or deployment. These stay manual in VS Code.
+- Background watching. RepoPilot runs when you start it.
+- Website UI. The website must read the JSON file.
 
-## Possible future increments
-- Verify CI checks from GitHub Actions.
-- Verify deployment state from the deployment provider or GitHub Deployments API.
-- Validate user-entered live URLs.
-- Add a graphical interface only if the terminal workflow proves inconvenient.
-- Provide a configurable adapter for different portfolio JSON schemas.
+## Possible later increments
+- Track which projects are new since the last write.
+- Reports and dashboard generated from the same folders.
+- An Electron wrapper, if the browser page proves inconvenient.

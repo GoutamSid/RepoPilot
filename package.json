@@ -1,15 +1,14 @@
 {
   "name": "repopilot",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": false,
-  "description": "A local GitHub repository catalogue tool that exports selected project information as JSON.",
+  "description": "A local tool that scans your project folders and writes a JSON file for your website.",
   "type": "module",
   "engines": {
     "node": ">=20.0.0"
   },
   "scripts": {
-    "start": "node src/index.js",
-    "sync": "node src/index.js",
+    "start": "node src/server.js",
     "test": "node --test"
   }
 }

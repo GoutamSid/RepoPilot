@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RepoPilot</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header>
+    <h1>RepoPilot</h1>
+    <p>Scan your project folders, choose what appears on your website, then write one JSON file. Nothing is uploaded, committed, or pushed.</p>
+  </header>
+  <main>
+    <section class="card">
+      <h2>1. Projects folder</h2>
+      <p id="projects-path" class="path">Not set</p>
+      <div class="row">
+        <button id="pick-projects" type="button">Browse…</button>
+        <input id="projects-input" type="text" placeholder="or paste a folder path">
+        <button id="save-projects" type="button">Use path</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>2. Website folder</h2>
+      <p id="website-path" class="path">Not set</p>
+      <div class="row">
+        <button id="pick-website" type="button">Browse…</button>
+        <input id="website-input" type="text" placeholder="or paste a folder path">
+        <button id="save-website" type="button">Use path</button>
+      </div>
+      <div class="row">
+        <label class="inline">JSON file inside the website folder
+          <input id="output-input" type="text">
+        </label>
+        <button id="save-output" type="button">Save path</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="row between">
+        <h2>3. Projects</h2>
+        <span id="summary" class="muted"></span>
+      </div>
+      <div id="projects"></div>
+    </section>
+
+    <section class="card">
+      <h2>4. Preview and write</h2>
+      <div class="row">
+        <button id="preview" type="button">Preview JSON</button>
+        <button id="write" type="button" class="primary">Write to website</button>
+      </div>
+      <p id="message" role="status"></p>
+      <pre id="preview-output" hidden></pre>
+    </section>
+  </main>
+  <script src="/app.js" defer></script>
+</body>
+</html>
