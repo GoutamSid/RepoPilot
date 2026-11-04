@@ -1,0 +1,15 @@
+{
+  "name": "repopilot",
+  "version": "0.1.0",
+  "private": false,
+  "description": "A local GitHub repository catalogue tool that exports selected project information as JSON.",
+  "type": "module",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "sync": "node src/index.js",
+    "test": "node --test"
+  }
+}

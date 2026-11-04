@@ -1,0 +1,10 @@
+# Local RepoPilot workspace: may contain private repository metadata.
+.repopilot/
+
+# Node / editor / OS output
+node_modules/
+*.log
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/tasks.json
